@@ -23,7 +23,7 @@ def patched_libreoffice_path():
  
 # Monkey patch the function in doc2pdf
 import doc2pdf
-doc2pdf.libreoffice_path = patched_libreoffice_path
+doc2pdf.libreoffice_path = patched_libreoffice_path()
 
 import warnings
 warnings.filterwarnings("ignore", category=SyntaxWarning)
@@ -67,7 +67,7 @@ class ProcessDoc:
     @staticmethod
     def convert_to_pdf(input_file, output_folder):
         command = [
-            "/usr/bin/soffice",
+            "libreoffice",
             "--headless",
             "--convert-to", "pdf",
             "--outdir", output_folder,
