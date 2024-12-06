@@ -82,45 +82,39 @@ class ProcessDoc:
     @staticmethod
     def convert_docx_to_images(docx_file):
         """Convert a DOCX file into individual images via PDF."""
-        
         with NamedTemporaryFile(delete=False, suffix=".docx") as temp_docx:
+            temp_docx.write(docx_file.read())
+            temp_docx_path = temp_docx.name
+        
+        try:
+            ProcessDoc.prevent_table_split(temp_docx_path, temp_docx_path)
+            pdf_path = temp_docx_path.replace(".docx", ".pdf")
+            ProcessDoc.convert_to_pdf(temp_docx_path, os.path.dirname(pdf_path))
+
+            if not os.path.isfile(pdf_path) or os.path.getsize(pdf_path) == 0:
+                raise ValueError("DOCX to PDF conversion failed or produced an invalid PDF.")
+
             try:
-                # Save the uploaded DOCX file to a temporary location
-                temp_docx.write(docx_file.read())
-                temp_docx_path = temp_docx.name
-                print("temp doc file name---: ",temp_docx_path)
-                # Prevent table splitting and save to the same temporary DOCX file
-                ProcessDoc.prevent_table_split(temp_docx_path, temp_docx_path)
-                print("processed table split")
-                # Convert the processed DOCX to PDF
-                pdf_path = temp_docx_path.replace(".docx",".pdf")
-                # convert(temp_docx_path, pdf_path)
-                ProcessDoc.convert_to_pdf(temp_docx_path, pdf_path)
-                print('converted temp doc to pdf')
-                # Validate the generated PDF
-                if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
-                    raise ValueError("Failed to convert DOCX to PDF. The file is empty or invalid.")
+                # Validate PDF
+                from PyPDF2 import PdfReader
+                reader = PdfReader(pdf_path)
+                if not reader.pages:
+                    raise ValueError("PDF has no pages.")
 
-                # Convert the PDF to images
+                # Convert PDF to images
                 images = convert_from_path(pdf_path, dpi=300)
-                print('converted pdf to images')
-            except PDFPageCountError:
-                raise ValueError("Unable to process the PDF file generated from DOCX.")
             except Exception as e:
-                raise ValueError(f"Error converting DOCX to images: {e}")
-            finally:
-                # Ensure temporary files are removed
-                for file_path in [temp_docx_path, pdf_path]:
-                    for _ in range(3):  # Retry mechanism
-                        try:
-                            os.remove(file_path)
-                            break
-                        except PermissionError:
-                            sleep(0.1)  # Delay before retrying
-                        except Exception as e:
-                            print(f"Warning: Failed to remove temp file {file_path}: {e}")
+                raise ValueError(f"PDF validation or image conversion failed: {e}")
+        finally:
+            # Cleanup
+            for file_path in [temp_docx_path, pdf_path]:
+                if os.path.isfile(file_path):
+                    try:
+                        os.remove(file_path)
+                    except Exception as e:
+                        print(f"Warning: Failed to remove temp file {file_path}: {e}")
 
-        return images  # Return the first 10 images
+        return images
 
 
     @staticmethod
