@@ -1,0 +1,89 @@
+Task:
+Extract all the text in the image.
+The text is related to "Responses to the loan application" section in image.
+If the image do not have "Responses to the loan application". Then extract all the text in the image.
+Negelect the tables,page number.
+Neglect arabic text.
+Give the response in the Json format:
+{"required_data":"extracted text"}
+
+Response example format
+example response-1:
+{"required_data":"""Responses to the loan application
+Credit Responses: 
+-	Kindly elaborate more on the project profile information. 
+-	Kindly attach the land deed title for the industrial land owned.
+-	Ownership percentages are not complete. Kindly revise this entry or elaborate more. 
+
+Marketing Responses: 
+-	Kindly clarify what are the products represents the building material stated in table 2.5.
+-	Kindly  refill table 2.5 stating each product sales volume and value. 
+"""}
+
+example response-2:
+{"required_data":"""-	Kindly fill the non-objection letter for information exchange and sign it. 
+-	Kindly fill table 4.1 and 4.2
+
+Marketing Responses: 
+-	Kindly clarify what are the products represents the building material stated in table 2.5.
+-	Kindly  refill table 2.5 stating each product sales volume and value. 
+-	Kindly complete table 2.10 
+
+Technical Responses: 
+-	Kindly fill the process diagram. 
+-	Kindly fill the table 3.2. 
+"""}
+
+example response-3:
+{"required_data":""" """}
+
+
+The data in the image can be in the following example formats.
+Example-1:
+Responses to the loan application
+Credit Responses: 
+-	Kindly elaborate more on the project profile information. 
+-	Kindly attach the land deed title for the industrial land owned.
+-	Ownership percentages are not complete. Kindly revise this entry or elaborate more. 
+
+Marketing Responses: 
+-	Kindly clarify what are the products represents the building material stated in table 2.5.
+-	Kindly  refill table 2.5 stating each product sales volume and value. 
+
+Technical Responses: 
+-	Kindly fill the process diagram. 
+-	Kindly fill the table 3.2. 
+
+Example-2:
+-	Kindly fill the non-objection letter for information exchange and sign it. 
+-	Kindly fill table 4.1 and 4.2
+
+Marketing Responses: 
+-	Kindly clarify what are the products represents the building material stated in table 2.5.
+-	Kindly  refill table 2.5 stating each product sales volume and value. 
+-	Kindly complete table 2.10 
+
+Technical Responses: 
+-	Kindly fill the process diagram. 
+-	Kindly fill the table 3.2. 
+
+Example-3:
+Marketing Responses: 
+-	Kindly clarify what are the products represents the building material stated in table 2.5.
+-	Kindly  refill table 2.5 stating each product sales volume and value. 
+
+Technical Responses: 
+-	Kindly fill the process diagram. 
+-	Kindly fill the table 3.2. 
+-	Kindly submit the documents mentioned in point 3.6
+-	Kindly fill table 3.7
+
+Instructions:
+Extract the text in the image following the exmple format suitable.
+If the image dont have any of the example format dont extract text from that image. Folow the format of the example-1,2,3.
+Do not include any preambles or commentary.
+Negelect the tables,page number.
+Neglect arabic text.
+Do not add "Classification: Confidential 43" in the response.
+Strictly follow response in the format of example-1,2,3.
+

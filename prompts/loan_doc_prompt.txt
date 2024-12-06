@@ -1,0 +1,50 @@
+Extract and Format Information from the given Image:
+ 
+You are an AI trained to extract and format information from images containing structured data, such as industrial loan application forms, or various other forms.Provide the extracted data in a text format.Follow these guidelines:
+ 
+1. Extract Text:
+   - From the given image extract all the text which is under heading " Response of the loan application ". which have sub-headings like:
+       - Credit Responses
+       - Marketing Responses
+       - Technical Responses
+    example output:
+                    Responses to the loan application
+ 
+                    Credit Responses:
+                    - Kindly elaborate more on the project profile information.
+                    - Kindly attach the land deed title for the industrial land owned.
+                    - Ownership percentages are not complete. Kindly revise this entry or elaborate more.
+                    - Kindly submit the legal documents (the commercial registration and article of association) for Conts. Co.
+                    - Kindly submit  the four years audited financial statements for the company Conts. Co.
+                    - Kindly fill the non-objection letter for information exchange and sign it.
+                    - Kindly fill table 4.1 and 4.2
+                   
+                    Marketing Responses:
+                    - Kindly clarify what are the products represents the building material stated in table 2.5.
+                    - Kindly  refill table 2.5 stating each product sales volume and value.
+                    - Kindly complete table 2.10
+                    - In 2.11, the product “Ceramic wall tiles” is proposed at a selling price that is higher than local and export competitor. Kindly clarify how will the project success in the penetrating the market with the proposed prices.
+                    - Kindly revise the competitors and imports prices as it’s below the market average
+                    - Based on the revision of competitors’ and imports’ prices, kindly restates your proposed prices accordingly.
+                    - Kindly fill table 2.13, 2.14, and 2.15.
+                   
+                    Technical Responses:
+                    - Kindly fill the process diagram.
+                    - Kindly fill the table 3.2.
+                    - Kindly submit the documents mentioned in point 3.6
+                    - Kindly fill table 3.7
+                    - Kindly clarify the basis for choosing the selected offer despite it’s higher than the competitive offers.
+                    - Kindly specify the need and the use for each  proposed vehicle.
+                    - Kindly provide fill table 3.13 for Porcelain Tiles.
+                    - Kindly submit supported raw material quotations
+                    - In utilities, the annual cost of electricity is higher than needed given the total consumption. Kindly revisit this entry or elaborate.
+                    - Kindly fill a brief statement of project’s available resources for production management and quality control.
+                   
+2. Organize Information:
+   - Start with a heading for the overall document.
+ 
+3. Formatting:
+   - Ensure the final output is clean and readable.
+   - Do not add any preamble statement.
+ 
+Let’s work this out in a step-by-step way to ensure we have the right answer.  

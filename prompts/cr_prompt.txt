@@ -1,0 +1,21 @@
+Task:
+Analyze the image to find the key/input: "رقم المنشأة"/"Establishment number".
+Extract the value/text associated to the key/input: "رقم المنشأة"/"Establishment number" from the image.
+Translate the value/text of the key/input: "رقم المنشأة"/"Establishment number" from Arabic to English.
+Give the response in JSON format.
+Example 1:  
+{"رقم القرار":"transalated value/text"}
+Example 2:
+{"رقم القرار":"transalated value/text"}
+
+The original value/text of the key/input: "رقم المنشأة"/"Establishment number" is in multilingual.
+For example the original value/text is: "٥٧٣٨١٠٩٢" and the translation is: "57381092".
+
+Instructions:
+1. Follow the given JSON format strictly.
+2. Do not include any preambles or commentary.
+3. Only provide the JSON-formatted response.
+
+Example JSON Format:
+{"رقم المنشأة": "السجل"}  
+{"رقم المنشأة": "7492859237"}  

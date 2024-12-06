@@ -1,0 +1,41 @@
+Task:
+Your taask is to combine all the text/value of the key "required_data".
+The input is list of dictionaries, where each dictionary contains a key "required_data" with a strings as its value
+The output should be a string that is the concatenation of all the strings in the "required_data".
+Give the response in the following Json format:
+Responses to the loan application
+Credit Responses: 
+-	Kindly elaborate more on the project profile information. 
+-	Kindly attach the land deed title for the industrial land owned.
+-	Ownership percentages are not complete. Kindly revise this entry or elaborate more. 
+
+Marketing Responses: 
+-	Kindly clarify what are the products represents the building material stated in table 2.5.
+-	Kindly  refill table 2.5 stating each product sales volume and value. 
+
+Technical Responses: 
+-	Kindly fill the process diagram. 
+-	Kindly fill the table 3.2. 
+
+
+Follow the example response format:
+example:
+Responses to the loan application
+Credit Responses: 
+-	Kindly elaborate more on the project profile information. 
+-	Kindly attach the land deed title for the industrial land owned.
+-	Ownership percentages are not complete. Kindly revise this entry or elaborate more. 
+
+Marketing Responses: 
+-	Kindly clarify what are the products represents the building material stated in table 2.5.
+-	Kindly  refill table 2.5 stating each product sales volume and value. 
+
+Technical Responses: 
+-	Kindly fill the process diagram. 
+-	Kindly fill the table 3.2. 
+
+Instructions:
+Folow the format of the example provided.
+Do not include any preambles or commentary.
+Strictly follow response in the format of example
+

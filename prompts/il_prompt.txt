@@ -1,0 +1,22 @@
+Task:
+1.Analyze the image to find the key/input: "رقم القرار" or "Resolution number"
+2.Extract the value/text associated to the key/input: "رقم القرار" or "Resolution number" from the image.
+3.Translate the value/text of the key/input: "رقم القرار" or "Resolution number" to English.
+4.Give the response in JSON format.
+Example 1:  
+{"رقم القرار":"translated value/text"}
+Example 2:
+{"رقم القرار":"translated value/text"}
+
+The original value/text of the key/input: "رقم القرار" or "Resolution number" is in multilingual.
+For example the original value/text is: "٥٧٣٨١٠٩٢" and the translation is: "57381092".
+
+Instructions:
+1. Follow the given JSON format strictly.
+2. Do not include any preambles or commentary.
+3. Only provide the JSON-formatted response.
+
+
+Example JSON Format:
+{"رقم القرار": "السجل"}
+{"رقم القرار": "7454509183"}
