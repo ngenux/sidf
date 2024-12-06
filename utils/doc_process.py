@@ -10,6 +10,7 @@ from .file_handler import StreamlitFileHandler
 from .prompt import PromptReader
 import boto3
 import re
+import subprocess
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor
 import os
@@ -62,6 +63,22 @@ class ProcessDoc:
             os.remove(temp_pdf_path)
 
         return images  # Return only the first 10 images
+    
+    @staticmethod
+    def convert_to_pdf(input_file, output_folder):
+        command = [
+            "/usr/bin/soffice",
+            "--headless",
+            "--convert-to", "pdf",
+            "--outdir", output_folder,
+            input_file,
+        ]
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode != 0:
+            raise RuntimeError(f"LibreOffice conversion failed: {result.stderr.decode('utf-8')}")
+        return f"File converted successfully to {output_folder}"
+    
+    
     @staticmethod
     def convert_docx_to_images(docx_file):
         """Convert a DOCX file into individual images via PDF."""
@@ -77,7 +94,8 @@ class ProcessDoc:
                 print("processed table split")
                 # Convert the processed DOCX to PDF
                 pdf_path = temp_docx_path.replace(".docx",".pdf")
-                convert(temp_docx_path, pdf_path)
+                # convert(temp_docx_path, pdf_path)
+                convert_to_pdf(temp_docx_path, pdf_path)
                 print('converted temp doc to pdf')
                 # Validate the generated PDF
                 if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
