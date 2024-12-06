@@ -1,7 +1,6 @@
 import base64
 import io
 import json
-import os
 from tempfile import NamedTemporaryFile
 from pdf2image import convert_from_path
 from PIL import Image
@@ -12,8 +11,21 @@ from .prompt import PromptReader
 import boto3
 import re
 from time import sleep
-from doc2pdf import convert
 from concurrent.futures import ThreadPoolExecutor
+import os
+from doc2pdf import convert
+ 
+# Override the path logic for LibreOffice
+def patched_libreoffice_path():
+    # Path for LibreOffice on Linux
+    return "/usr/bin/soffice"
+ 
+# Monkey patch the function in doc2pdf
+import doc2pdf
+doc2pdf.libreoffice_path = patched_libreoffice_path
+
+import warnings
+warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 class ProcessDoc:
     def __init__(self, doc_file_uploaded, bedrock_client):
