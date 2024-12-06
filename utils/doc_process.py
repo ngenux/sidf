@@ -12,7 +12,6 @@ from .prompt import PromptReader
 import boto3
 import re
 from time import sleep
-from pdf2image.exceptions import PDFPageCountError
 from doc2pdf import convert
 from concurrent.futures import ThreadPoolExecutor
 
