@@ -6,3 +6,4 @@ doc2pdf==0.2.0
 pillow==11.0.0
 python-dotenv==1.0.1
 libreoffice_convert==1.0
+poppler-utils==0.1.0
