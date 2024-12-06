@@ -95,7 +95,7 @@ class ProcessDoc:
                 # Convert the processed DOCX to PDF
                 pdf_path = temp_docx_path.replace(".docx",".pdf")
                 # convert(temp_docx_path, pdf_path)
-                convert_to_pdf(temp_docx_path, pdf_path)
+                ProcessDoc.convert_to_pdf(temp_docx_path, pdf_path)
                 print('converted temp doc to pdf')
                 # Validate the generated PDF
                 if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
