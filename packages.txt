@@ -1,2 +1,2 @@
 libreoffice
-poppler-utils
+poppler
