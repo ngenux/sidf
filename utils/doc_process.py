@@ -14,16 +14,16 @@ import subprocess
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor
 import os
-from doc2pdf import convert
+# from doc2pdf import convert
  
 # Override the path logic for LibreOffice
-def patched_libreoffice_path():
-    # Path for LibreOffice on Linux
-    return "/usr/bin/soffice"
+# def patched_libreoffice_path():
+#     # Path for LibreOffice on Linux
+#     return "/usr/bin/soffice"
  
-# Monkey patch the function in doc2pdf
-import doc2pdf
-doc2pdf.libreoffice_path = patched_libreoffice_path()
+# # Monkey patch the function in doc2pdf
+# import doc2pdf
+# doc2pdf.libreoffice_path = patched_libreoffice_path()
 
 import warnings
 warnings.filterwarnings("ignore", category=SyntaxWarning)
