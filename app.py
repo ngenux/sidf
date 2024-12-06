@@ -7,7 +7,6 @@ from utils.prompt import PromptReader
 from utils.cr_process import ProcessCR
 from utils.il_process import ProcessIL
 from utils.doc_process import ProcessDoc
-from utils.missing_fields import ProcessMissingfields
 from dotenv import load_dotenv
 import os
 
