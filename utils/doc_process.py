@@ -90,7 +90,7 @@ class ProcessDoc:
             ProcessDoc.prevent_table_split(temp_docx_path, temp_docx_path)
             pdf_path = temp_docx_path.replace(".docx", ".pdf")
             ProcessDoc.convert_to_pdf(temp_docx_path, os.path.dirname(pdf_path))
-
+            print("converted docx to pdf")
             if not os.path.isfile(pdf_path) or os.path.getsize(pdf_path) == 0:
                 raise ValueError("DOCX to PDF conversion failed or produced an invalid PDF.")
 
@@ -103,6 +103,7 @@ class ProcessDoc:
 
                 # Convert PDF to images
                 images = convert_from_path(pdf_path, dpi=300)
+                print("converted pdf to image.")
             except Exception as e:
                 raise ValueError(f"PDF validation or image conversion failed: {e}")
         finally:
@@ -111,6 +112,7 @@ class ProcessDoc:
                 if os.path.isfile(file_path):
                     try:
                         os.remove(file_path)
+                        print("removed temp files.")
                     except Exception as e:
                         print(f"Warning: Failed to remove temp file {file_path}: {e}")
 
