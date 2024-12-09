@@ -14,6 +14,7 @@ import subprocess
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor
 import os
+from logger_config import logger
 # from doc2pdf import convert
  
 # Override the path logic for LibreOffice
@@ -44,6 +45,7 @@ class ProcessDoc:
                     cell.paragraphs[0].paragraph_format.keep_together = True
                     cell.paragraphs[0].paragraph_format.keep_with_next = True
         doc.save(output_path)
+        logger.info("sucesfully run function prevent teble split")
 
     @staticmethod
     def convert_pdf_to_images(pdf_file):
@@ -51,16 +53,20 @@ class ProcessDoc:
         with NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
             temp_pdf.write(pdf_file.read())
             temp_pdf_path = temp_pdf.name
-
+            logger.info(f"saved uploaded pdf in temp -: {temp_pdf_path}")
         try:
             # Convert the PDF to images
             images = convert_from_path(temp_pdf_path, dpi=300)
             print('converted pdf to images')
+            logger.info("converted pdf to image.")
         except PDFPageCountError:
             raise ValueError("The uploaded file is not a valid PDF or is corrupted.")
+        except Exception as e:
+            logger.error(f"Error occured in convertion of pdf to image - {e}")
         finally:
             # Clean up the temporary file
             os.remove(temp_pdf_path)
+            logger.info("removed Temp file.")
 
         return images  # Return only the first 10 images
     
@@ -85,11 +91,13 @@ class ProcessDoc:
         with NamedTemporaryFile(delete=False, suffix=".docx") as temp_docx:
             temp_docx.write(docx_file.read())
             temp_docx_path = temp_docx.name
-        
+            logger.info(f"saved uploaded docx in temp -: {temp_pdf_path}")
+
         try:
             ProcessDoc.prevent_table_split(temp_docx_path, temp_docx_path)
             pdf_path = temp_docx_path.replace(".docx", ".pdf")
             ProcessDoc.convert_to_pdf(temp_docx_path, os.path.dirname(pdf_path))
+            logger.info("converted pdf to image.")
             print("converted docx to pdf")
             if not os.path.isfile(pdf_path) or os.path.getsize(pdf_path) == 0:
                 raise ValueError("DOCX to PDF conversion failed or produced an invalid PDF.")
@@ -104,6 +112,7 @@ class ProcessDoc:
                 # Convert PDF to images
                 images = convert_from_path(pdf_path, dpi=300)
                 print("converted pdf to image.")
+                logger.info("pdf to image")
             except Exception as e:
                 raise ValueError(f"PDF validation or image conversion failed: {e}")
         finally:
@@ -113,6 +122,7 @@ class ProcessDoc:
                     try:
                         os.remove(file_path)
                         print("removed temp files.")
+                        logger.info("removed all temp files.")
                     except Exception as e:
                         print(f"Warning: Failed to remove temp file {file_path}: {e}")
 
@@ -128,6 +138,7 @@ class ProcessDoc:
             bg.save(buffer, format="JPEG")
             buffer.seek(0)
             image_b64_string = base64.b64encode(buffer.read()).decode("utf-8")
+            logger.info("converted image to base64")
             return image_b64_string
 
     @staticmethod
@@ -173,15 +184,17 @@ class ProcessDoc:
     def extract_number(self,value):
         match = re.search(r'\d+', value)  # Extract the first sequence of digits
         return match.group(0) if match else None
+        logger.info("extarcted number from value.")
     
     def process_files_data(self):
                 # Read the prompt
         pr = PromptReader('prompts/loan_application.txt')
         prompt = pr.read_prompt()
-
+        logger.info("sucessfully read the prompt file --: loan_application.txt")
         # Determine file type and convert to images
         file_name = self.doc_file_uploaded.name.lower()
         print("uploaded file name----: ",file_name)
+        logger.info("uploaded file name-: {file_name}")
         if file_name.endswith('.pdf'):
             images = self.convert_pdf_to_images(self.doc_file_uploaded)
         elif file_name.endswith('.docx'):
@@ -206,6 +219,7 @@ class ProcessDoc:
         # print(doc_response)
         doc_response = json.loads(doc_response)
         # print('type of doc_response',type(doc_response))
+        logger.info("sucesfuly run bedrock. obtained bedrock response for CR and IL.")
         commercial_register_value = None
         industrial_license_value = None
         if 'data' in doc_response:
@@ -215,9 +229,11 @@ class ProcessDoc:
 
             print("Commercial Register No.:", commercial_register_value)
             print("Industrial License No.:", industrial_license_value)
+            logger.info(f"Commercial Register No.: {commercial_register_value}")
+            logger.info(f"Industrial License No.: {industrial_license_value}")
         else:
             print("'data' key is not present in the dictionary.")
-
+            logger.info("'data' key is not present in the dictionary.")
 
         if 'general_information' in doc_response:
             general_info = doc_response['general_information']
@@ -238,17 +254,23 @@ class ProcessDoc:
             if commercial_register_value:
                 commercial_register_value = self.extract_number(commercial_register_value)
                 print("Commercial Register No.: ",commercial_register_value )
+                logger.info(f"Commercial Register No.: {commercial_register_value}")
             else:
                 print("Commercial key not found.")
+                logger.info("Commercial key not found.")
 
             if industrial_license_value:
                 industrial_license_value = self.extract_number(industrial_license_value)
                 print("Industrial License No.:", industrial_license_value)
+                logger.info(f"Industrial License No.: {industrial_license_value}")
             else:
                 print("Industry key not found.")
+                logger.info("Industry key not found.")
         else:
             print("'general_information' key is not present in the dictionary.")
+            logger.info("'general_information' key is not present in the dictionary.")
         print({"commercial_register_value":commercial_register_value, "industrial_license_value":industrial_license_value})
+        logger.info(f"commercial_register_value: {commercial_register_value}, industrial_license_value: {industrial_license_value}")
         return {"commercial_register_value":commercial_register_value, "industrial_license_value":industrial_license_value}
     
     def missing_fileds(self,images):
@@ -256,6 +278,7 @@ class ProcessDoc:
         result = []
         pr = PromptReader('prompts/missing.txt')
         prompt = pr.read_prompt()
+        logger.info("read the prompt from-: missing.txt")
         # Convert the first image to base64
         for image in images[-4:]:
             image_b64 = self.image_to_base64(image)
@@ -270,11 +293,14 @@ class ProcessDoc:
             print(fields_data)
             result.append(fields_data)
         print(result)
+        logger.info("extracted dat for missing fields.")
         print(type(result))
         
         pr = PromptReader('prompts/missing_result.txt')
         prompt = pr.read_prompt()
+        logger.info("missing_result.txt")
         missing_data = self.bedrock_client.get_response_text(prompt,result,model_id=self.model_id)
+        logger.info("sucessfully extracted missing fields.")
         print(type(missing_data))
         
         return {"file_data":result,
