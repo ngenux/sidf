@@ -50,6 +50,9 @@ class BedrockClient(LLMClient):
                 "anthropic_version": "bedrock-2023-05-31",
                 "max_tokens": 10000,
                 "messages": messages,
+                "temperature": 0.1,
+                "top_k": 250,
+                "top_p": 0.999,
             })
 
             # Invoke Bedrock model
