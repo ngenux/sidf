@@ -91,13 +91,13 @@ class ProcessDoc:
         with NamedTemporaryFile(delete=False, suffix=".docx") as temp_docx:
             temp_docx.write(docx_file.read())
             temp_docx_path = temp_docx.name
-            logger.info(f"saved uploaded docx in temp -: {temp_pdf_path}")
+            logger.info(f"saved uploaded docx in temp -: {temp_docx_path}")
 
         try:
             ProcessDoc.prevent_table_split(temp_docx_path, temp_docx_path)
             pdf_path = temp_docx_path.replace(".docx", ".pdf")
             ProcessDoc.convert_to_pdf(temp_docx_path, os.path.dirname(pdf_path))
-            logger.info("converted pdf to image.")
+            logger.info("converted docx to pdf.")
             print("converted docx to pdf")
             if not os.path.isfile(pdf_path) or os.path.getsize(pdf_path) == 0:
                 raise ValueError("DOCX to PDF conversion failed or produced an invalid PDF.")
