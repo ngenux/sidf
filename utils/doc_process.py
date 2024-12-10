@@ -220,12 +220,13 @@ class ProcessDoc:
         doc_response = json.loads(doc_response)
         # print('type of doc_response',type(doc_response))
         logger.info("sucesfuly run bedrock. obtained bedrock response for CR and IL.")
+        logger.info(f"docx response -: {doc_response}")
         commercial_register_value = None
         industrial_license_value = None
         if 'data' in doc_response:
             # Extract values for "Commercial Register No." and "Industrial license no."
             commercial_register_value = self.extract_number(next(item['Value'] for item in doc_response['data'] if "commercial" in item['Field'].lower()))
-            industrial_license_value = self.extract_number(next(item['Value'] for item in doc_response['data'] if "industr" in item['Field'].lower()))
+            industrial_license_value = self.extract_number(next(item['Value'] for item in doc_response['data'] if item['Field'].lower().startswith("industr")))
 
             print("Commercial Register No.:", commercial_register_value)
             print("Industrial License No.:", industrial_license_value)
