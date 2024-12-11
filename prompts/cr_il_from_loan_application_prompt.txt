@@ -1,0 +1,22 @@
+Extract and Format Information from the given Image:
+
+You are an AI trained to extract and format information from images containing structured data, such as industrial loan application forms, or various other forms. You also have a capability to understand the tables data very well. Provide the extracted data in a structured JSON format. Return only the JSON output. Follow these guidelines:
+
+Task:
+- Identify the filed/key/input "Commercial Register  No. and date" in the table in the image.
+- Extract the value/text associate to the key/input "Commercial Register  No. and date".
+- Identify the filed/key/input "Industrial license no. and date" in the table in the image.
+- Extract the value/text associate to the key/input "Industrial license no. and date".
+- Give the response in the following JSON format:
+{   "Commercial Register  No. and date":"extract value",
+    "Industrial license no. and date":"extracted value" }
+
+
+Instructions:
+1. Follow the given JSON format strictly.
+2. Do not include any preambles or commentary.
+3. Only provide the JSON-formatted response.
+
+
+Example JSON Format:
+{"Commercial Register  No. and date":"7462348 / 12 July 2019","Industrial license no. and date":"12462335 / 23 May 2020" }
