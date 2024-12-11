@@ -1,6 +1,5 @@
 import streamlit as st
 from PIL import Image
-import time
 from utils.file_handler  import StreamlitFileHandler
 from llm.bedrock_client import BedrockClient
 from utils.prompt import PromptReader
@@ -9,7 +8,8 @@ from utils.il_process import ProcessIL
 from utils.doc_process import ProcessDoc
 from dotenv import load_dotenv
 import os
-
+from logger_config import logger
+from concurrent.futures import ThreadPoolExecutor
 load_dotenv()
 
 class DocumentProcessingApp:
@@ -58,6 +58,33 @@ class DocumentProcessingApp:
         comm_licence = st.file_uploader("Upload Commercial Registration", type=["jpg", "png"])
         return doc_file, industry_licence, comm_licence
 
+ 
+def log_task_start(task_name):
+    logger.info(f"{task_name} has started.")
+ 
+def process_document(doc_file, bedrock_client):
+    log_task_start("Document Processing")
+    if doc_file:
+        doc_process = ProcessDoc(doc_file, bedrock_client)
+        return doc_process.file_processor()
+    return None
+ 
+ 
+def process_commercial_registration(comm_licence, bedrock_client):
+    log_task_start("Commercial Registration Processing")
+    if comm_licence:
+        cr_processor = ProcessCR(comm_licence, bedrock_client)
+        return cr_processor.process_files()
+    return None
+ 
+ 
+def process_industry_license(industry_licence, bedrock_client):
+    log_task_start("Industry License Processing")
+    if industry_licence:
+        il_process = ProcessIL(industry_licence, bedrock_client)
+        return il_process.process_files()
+    return None
+
 def main():
     # Create the DocumentProcessingApp instance
     app = DocumentProcessingApp(
@@ -81,55 +108,39 @@ def main():
     cr_response = None
     il_response = None 
     doc_response = None
-    # missing_field_response = None
+    
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
-        btnResult = st.button("Process", key="parse")
-        if btnResult:
-            # Create an instance of ProcessDoc to handle the file processing
-            if doc_file:
-                doc_process = ProcessDoc(doc_file,bedrock_client)
-                doc_response = doc_process.file_processor()
-            # finding missing fields
-            # if doc_file:
-            #     missing_field_process = ProcessMissingfields(doc_file,bedrock_client)
-            #     missing_field_response = missing_field_process.process_files()
-            # Create an instance of ProcessCR to handle the file processing
-            if comm_licence:
-                cr_processor = ProcessCR(comm_licence, bedrock_client)
-                cr_response = cr_processor.process_files()
-                print("CR-NUMBER: ",cr_response)
-            else: 
-                st.write("Upload Commercial Registration.")
-            
-            # Create an instance of ProcessIL to handle the file processing
-            if industry_licence:
-                il_process = ProcessIL(industry_licence,bedrock_client)
-                il_response = il_process.process_files()
-                print("IL-NUMBER: ",il_response)
-            else:
-                st.write("Upload Industry License")
-    
-    # if cr_response:
-    #     st.write("Commercial Registration Number: ", cr_response)
-    #     # st.write("Response from Bedrock for Commercial Registration: ", cr_response["رقم المنشأة"])
-    # if il_response:
-    #     st.write("Industry License Number: ", il_response)
-    #     # st.write("response from Bedrock for Industry License: ",il_response["رقم القرار"])
+        btn_result = st.button("Process", key="parse")
+        if btn_result:
+            logger.info("Starting parallel processing for all tasks.")
+            with ThreadPoolExecutor() as executor:
+                futures = {
+                    "doc_response": executor.submit(
+                        process_document, doc_file, bedrock_client
+                    ),
+                    "cr_response": executor.submit(
+                        process_commercial_registration, comm_licence, bedrock_client
+                    ),
+                    "il_response": executor.submit(
+                        process_industry_license, industry_licence, bedrock_client
+                    ),
+                }
+            results = {key: future.result() for key, future in futures.items()}
+            logger.info("Completed parallel processing for all tasks.")
+            doc_response = results["doc_response"]
+            cr_response = results["cr_response"]
+            il_response = results["il_response"]
+            logger.info("Completed parallel processing for all tasks.")
+
     if doc_response :
-        print(f"response after uploading doc file---: {doc_response}")
-        # st.write("Fields which do not have data :",doc_response)
-        # st.write(doc_response['missing']['missing_data'])
         st.write("Fields which do not have data:")
-        
         # Extract the missing data
         missing_data = doc_response.get('missing', {}).get('missing_data', '')
 
         # Display the missing data in a text box
         st.text_area("Missing Data", value=str(missing_data), height=200)
-        # st.write("Industry license number from Bedrock for Loan Application: ", doc_response[0]["industrial_license_value"])
-        # st.write("Commercial Registration number from Bedrock for Loan Application: ", doc_response[0]['commercial_register_value'])
-        # check if industry license for imge is same as in loan aplication
+
         # Check Industry License Response
         if il_response and "رقم القرار" in il_response:
             if doc_response.get("cr_and_il", {}).get("industrial_license_value") == il_response["رقم القرار"]:
