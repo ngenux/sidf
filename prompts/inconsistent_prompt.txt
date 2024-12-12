@@ -1,0 +1,5 @@
+Task:
+- You are provided with the data of Loan Application which inclued table data, text data.
+- Identify any abnormal behaviuor in the values of each table.
+- Give the information of all table which has such abnormal pattern in the values of the row or table.
+- Do not include any preambles or commentary.
