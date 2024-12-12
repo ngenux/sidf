@@ -11,14 +11,14 @@ from .file_handler import StreamlitFileHandler
 from .prompt import PromptReader
 import re
 from time import sleep
+from doc2pdf import convert
 from concurrent.futures import ThreadPoolExecutor
 from logger_config import logger
 import subprocess
 from PyPDF2 import PdfReader
 from dotenv import load_dotenv
 load_dotenv()
-
-PATH_LIBREOFFICE = os.getenv("PATH_TO_LIBREOFFICE")
+PATH_LIBREOFFICE = os.getenv("PATH_LIBREOFFICE") 
 
 class ProcessDoc:
     def __init__(self, doc_file_uploaded, bedrock_client):
@@ -48,7 +48,6 @@ class ProcessDoc:
         try:
             # Convert the PDF to images
             images = convert_from_path(temp_pdf_path, dpi=300)
-            print('converted pdf to images')
             logger.info("converte temp pdf to images.")
         except PDFPageCountError:
             raise ValueError("The uploaded file is not a valid PDF or is corrupted.")
@@ -64,7 +63,7 @@ class ProcessDoc:
     @staticmethod
     def convert_to_pdf(input_file, output_folder):
         command = [
-            PATH_LIBREOFFICE,
+            "libreoffice",
             "--headless",
             "--convert-to", "pdf",
             "--outdir", output_folder,
@@ -103,15 +102,17 @@ class ProcessDoc:
             except Exception as e:
                 logger.error("Error occured: {e}")
                 raise ValueError(f"PDF validation or image conversion failed: {e}")
-        finally:
-            # Cleanup
-            for file_path in [temp_docx_path, pdf_path]:
-                if os.path.isfile(file_path):
-                    try:
-                        os.remove(file_path)
-                        logger.info("removed all temp files.")
-                    except Exception as e:
-                        logger.error(f"Warning: Failed to remove temp file {file_path}: {e}")
+        except Exception as e:
+            logger.error(e)
+        # finally:
+        #     # Cleanup
+        #     for file_path in [temp_docx_path, pdf_path]:
+        #         if os.path.isfile(file_path):
+        #             try:
+        #                 os.remove(file_path)
+        #                 logger.info("removed all temp files.")
+        #             except Exception as e:
+        #                 logger.error(f"Warning: Failed to remove temp file {file_path}: {e}")
         return images
 
 
@@ -212,18 +213,45 @@ class ProcessDoc:
                 "missing_data":missing_data
                 }
 
+    def process_inconsistent_data(self,images):
+        result = []
+        pr = PromptReader('prompts/loan_application.txt')
+        prompt_full_data = pr.read_prompt()
+        logger.info("read propmt from prompts/loan_application.txt")
+        # Convert the first image to base64
+        for image in images:
+            image_b64 = self.image_to_base64(image)
+
+        # Get the response from the model
+            fields_data = self.bedrock_client.get_response(
+                prompt=prompt_full_data,
+                encoded_file=image_b64,
+                mime_type="image/jpeg",
+                model_id=self.model_id,
+            )
+            result.append(fields_data)
+            logger.info("extracted data from image.")
+        pr = PromptReader('prompts/inconsistent_prompt.txt')
+        prompt_inconsistent_data = pr.read_prompt()
+        logger.info("read propmt from prompts/inconsistent_prompt.txt")
+        
+        # Get the response from the model
+        incs_data = self.bedrock_client.get_response_text(prompt_inconsistent_data,result,model_id=self.model_id)
+        logger.info(f"result from sonnet for inconsistent data: {fields_data}")
+        return incs_data
+
     def file_processor(self):
         images = ProcessDoc.process_files_data(self)
-        
         # Define the parallel tasks
         with ThreadPoolExecutor() as executor:
             future_resp_1 = executor.submit(self.process_il_cr_numbers, images)
             future_resp_2 = executor.submit(self.missing_fileds, images)
-            
+            future_resp_3 = executor.submit(self.process_inconsistent_data,images)
             # Retrieve results from futures
             resp_1 = future_resp_1.result()
             resp_2 = future_resp_2.result()
-        final_result = {"cr_and_il": resp_1, "missing": resp_2}
-        logger.info(f"IL,CR and missing data: {final_result}")
+            resp_3 = future_resp_3.result()
+        final_result = {"cr_and_il": resp_1, "missing": resp_2,"inc_data":resp_3}
+        logger.info(f"IL,CR,missing data and inconsistent data: {final_result}")
         return final_result
 
