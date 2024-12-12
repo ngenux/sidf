@@ -127,7 +127,6 @@ def main():
                     ),
                 }
             results = {key: future.result() for key, future in futures.items()}
-            logger.info("Completed parallel processing for all tasks.")
             doc_response = results["doc_response"]
             cr_response = results["cr_response"]
             il_response = results["il_response"]
@@ -137,9 +136,12 @@ def main():
         st.write("Fields which do not have data:")
         # Extract the missing data
         missing_data = doc_response.get('missing', {}).get('missing_data', '')
-
         # Display the missing data in a text box
         st.text_area("Missing Data", value=str(missing_data), height=200)
+        
+        # extract inconsistent data
+        inconsistent_data = doc_response.get("inc_data",{})
+        st.text_area("Inconcsistent Data", value=str(inconsistent_data), height=200)
 
         # Check Industry License Response
         if il_response and "رقم القرار" in il_response:
